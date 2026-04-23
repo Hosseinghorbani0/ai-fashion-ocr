@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چت‌بات یونیکا</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- اضافه کردن jQuery -->
+</head>
+<body>
+    <!-- Modal برای وارد کردن شماره تلفن -->
+    <div class="modal" id="phone-modal">
+        <div class="modal-content">
+            <h3>لطفا شماره تلفن خود را وارد کنید:</h3>
+            <div class="input-wrapper" style="position: relative;">
+                <i class="phone-icon">📱</i> <!-- آیکون موبایل -->
+                <input type="text" id="phone-input" placeholder="شماره تلفن خود را وارد کنید"onkeypress="handleKeyPress(event)">
+            </div>
+            <p></p>
+            <button onclick="submitPhoneNumber()">تایید</button>
+        </div>
+    </div>
+    <div class="container">
+        <header>
+            <img src="hescopy.png" alt="تصویر اصلی">
+        </header>
+        <section class="gallery">
+            <img src="hes1.jpg" alt="عکس 1">
+            <img src="hes2.jpg" alt="عکس 2">
+            <img src="hes3.jpg" alt="عکس 3">
+            <img src="hes4.jpg" alt="عکس 4">
+        </section>
+        <footer>
+        </footer>
+      </div>
+
+    <div class="chat-icon" onclick="toggleChatbox()" style="display:none;">💬</div>
+
+    <div class="chatbox" style="display:none;">
+        <div class="chatbox-header">
+            <span class="chat-title">چت‌بات یونیکا</span> 
+            <span class="close-btn" onclick="closeChatbox()">✖</span> 
+         </div>
+        <div class="chatbox-messages" id="messages"></div>
+        <div class="chatbox-input">
+            <div class="typing-indicator" id="typing-indicator" style="display: none;">...</div>
+            <div class="preset-buttons">
+                <button onclick="sendPresetMessage('آدرس مزون کجاست؟')">آدرس مزون کجاست؟</button>
+                <button onclick="sendPresetMessage('نحوه سفارش محصولات')">نحوه سفارش محصولات</button>
+            </div>
+            </div>
+            <div class="input-area">
+                <input type="file" id="image-input" accept="image/*" style="display: none;" onchange="handleImageUpload()">
+                <label for="image-upload" class="upload-btn">📷</label>
+                <input type="file" id="image-upload" accept="image/*" hidden>
+                <input type="text" id="user-input" placeholder="پیام خود را بنویسید..." onkeypress="handleKeyPress(event)">
+                <button class="send-btn" onclick="sendMessage()">ارسال</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mobile = "";
+        window.onload = function() {
+            // نمایش مودال شماره تلفن
+            document.getElementById('phone-modal').style.display = 'flex';
+        };
+
+        function closeChatbox() {
+           const chatbox = document.querySelector('.chatbox');
+           chatbox.style.display = 'none'; 
+        }
+
+
+        function submitPhoneNumber() {
+            mobile = document.getElementById('phone-input').value.trim();
+            if (mobile) {
+                // پنهان کردن مودال و نمایش چت
+                document.getElementById('phone-modal').style.display = 'none';
+                document.querySelector('.chat-icon').style.display = 'flex';
+            } else {
+                alert("لطفا شماره تلفن را وارد کنید.");
+            }
+        }
+
+        function toggleChatbox() {
+            const chatbox = document.querySelector('.chatbox');
+            chatbox.style.display = chatbox.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function sendPresetMessage(text) {
+            addMessage(text, 'user');
+            simulateBotResponse(text);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+
+            if (text) {
+                addMessage(text, 'user');
+                input.value = '';
+                simulateBotResponse(text);
+
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+                submitPhoneNumber();
+
+            }
+        }
+
+        function addMessage(text, sender) {
+            const message = document.createElement('div');
+            message.className = `message ${sender}`;
+            message.innerHTML = text;
+            const messagesContainer = document.getElementById('messages');
+            messagesContainer.appendChild(message);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        }
+
+        function imageBase64(images,sender) {
+            const messagesContainer = document.getElementById('messages'); // نام بهتر
+            images.forEach(imageBase64 => {
+             const imgMessage = document.createElement('div');
+             imgMessage.className = `img ${sender}`;
+             const img = document.createElement('img');
+             img.src = 'data:image/jpeg;base64,' + imageBase64;
+             img.style.maxWidth = '200px'; // تنظیم حداکثر عرض تصویر
+             img.style.borderRadius = '8px'; // گوشه‌های گرد
+             imgMessage.appendChild(img); // افزودن تصویر به پیام
+             messagesContainer.appendChild(imgMessage); // افزودن پیام به چت‌باکس
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight; // اسکرول به انتهای چت
+        }
+
+        function simulateBotResponse(userMessage) {
+            document.getElementById('typing-indicator').style.display = 'inline-block';
+
+            $.ajax({
+                url: 'http://127.0.0.1:5000/chat',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    phone: mobile,
+                    content: userMessage
+                }),
+                success: function(response) {
+                    document.getElementById('typing-indicator').style.display = 'none';
+                    if (Array.isArray(response.images) && response.images.length > 0) {
+                        imageBase64(response.images, 'system');
+                    }
+                    else (addMessage(response.message, 'system'))
+                },
+                error: function(xhr, status, error) {
+                    document.getElementById('typing-indicator').style.display = 'none';
+                    addMessage('خطا در ارسال پیام، لطفاً دوباره تلاش کنید.', 'system');
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+         const imageUpload = document.getElementById('image-upload');
+         const chatBox = document.getElementById('messages'); // اطمینان از تعریف عنصر chatBox
+
+         imageUpload.addEventListener('change', (event) => {
+             const file = event.target.files[0];
+             if (file) {
+                 const reader = new FileReader();
+                 const formData = new FormData();
+                 formData.append('image', file);
+                 formData.append('phone', mobile);
+                 document.getElementById('typing-indicator').style.display = 'inline-block';
+
+                 fetch('http://127.0.0.1:5000/upload', {
+                     method: 'POST',
+                     body: formData
+               })
+               .then(response => response.json())
+               .then(data => {
+                  console.log('Image uploaded:', data);
+                  document.getElementById('typing-indicator').style.display = 'none';
+                  let message = 'توضیحات محصول:\n';
+
+                  const سایز = data.message[0]['سایز'];
+                  const قیمت = data.message[1]['قیمت'];
+                  const قد = data.message[2]['قد'];
+                  const جنس = data.message[3]['جنس'];
+
+                  message += `تا سایز : ${سایز}<br>`;
+                  message += `قیمت: ${قیمت}<br>`;
+                  message += `جنس: ${جنس}<br>`;
+                  message += `قد: ${قد}<br>`;
+                  message = message.replace("\n", "<br>")  // تبدیل خط جدید به <br>
+                  message = message.replace("\r", "")  // حذف \r که ممکن است تداخل ایجاد کند
+
+                  addMessage(message, 'system');
+                })
+               .catch(error => {
+                     console.error('Error uploading image:', error);
+                     document.getElementById('typing-indicator').style.display = 'none';
+
+                     addMessage('خطا در پردازش تصویر، لطفاً دوباره تلاش کنید.', 'system');
+               });
+               
+                 reader.onload = (e) => {
+                     const imgMessage = document.createElement('div');
+                     imgMessage.classList.add('message', 'user'); // کلاس برای نمایش پیام کاربر
+                     const img = document.createElement('img');
+                     img.src = e.target.result; // پیش‌نمایش تصویر
+                     img.style.maxWidth = '200px'; // محدود کردن اندازه تصویر
+                     img.style.borderRadius = '8px'; // گوشه‌های گرد
+                     imgMessage.appendChild(img); // افزودن تصویر به پیام
+                     chatBox.appendChild(imgMessage); // افزودن پیام به چت‌باکس
+                     chatBox.scrollTop = chatBox.scrollHeight; // اسکرول به انتهای چت
+                 };
+                 reader.readAsDataURL(file); // خواندن تصویر به صورت Base64
+             } 
+         });
+    });
+
+ </script>
+</body>
+</html>
