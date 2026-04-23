@@ -1,0 +1,417 @@
+/* انیمیشن چشمک زن برای سه نقطه */
+@font-face {
+    font-family:'iransans' ;
+    src: url('iransans.ttf');
+}
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.blinking {
+    animation: blink 1s infinite;
+}
+
+.chat-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff; /* رنگ آبی */
+    color: #fff;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* گرد کردن آیکون */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* سایه برای جذابیت بیشتر */
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.chat-icon:hover {
+    background-color: #0056b3; /* رنگ آبی تیره هنگام هاور */
+    transform: scale(1.1); /* بزرگ‌تر شدن آیکون هنگام هاور */
+}
+
+.chatbox {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 100%;
+    max-width: 400px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 9px;
+    overflow: hidden;
+    z-index: 1000;
+    font-family: 'iransans', sans-serif;
+}
+
+.chatbox-header {
+    background-color: #496eaf;
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 2px solid #3b5a94;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+}
+.chat-title {
+    flex-grow: 1; 
+    text-align: center; 
+}
+.close-btn {
+    font-size: 22px;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.7); 
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: white; 
+}
+
+.chatbox-messages {
+    padding: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-family: 'iransans', sans-serif;
+}
+
+.chatbox-input {
+    padding: 10px;
+    background-color: #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    font-family: 'iransans', sans-serif;
+}
+
+.preset-buttons button {
+    background-color: #496eaf;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.preset-buttons button:hover {
+    background-color: #3b5a94;
+}
+
+.send-btn {
+    background-color: #496eaf;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s;
+    font-family: 'iransans', sans-serif;
+}
+
+.send-btn:hover {
+    background-color: #3b5a94;
+    transform: scale(1.05);
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    font-family: 'iransans', sans-serif;
+}
+
+.input-area input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: 'iransans', sans-serif;
+}
+
+.input-area input:focus {
+    outline: none;
+    border-color: #496eaf;
+    box-shadow: 0 0 5px rgba(73, 110, 175, 0.5);
+}
+
+.typing-indicator {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    color: #888;
+    display: none;
+    animation: blink 1s infinite;
+}
+
+/* پیام‌های کاربر در سمت راست */
+.message.user {
+    text-align: right;
+    background-color: #496eaf;
+    color: white;
+    border-radius: 15px 15px 0 15px;
+    padding: 10px 15px;
+    margin: 5px 0;
+    max-width: 70%;
+    align-self: flex-end;
+    word-wrap: break-word;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    direction: rtl;
+    text-align: right;
+    font-family: 'iransans', sans-serif;
+}
+
+/* پیام‌های سیستم در سمت چپ */
+.message.system {
+    text-align: left;
+    background-color: #e5e5e5;
+    color: #333;
+    border-radius: 15px 15px 15px 0;
+    padding: 10px 15px;
+    margin: 5px 0;
+    max-width: 70%;
+    align-self: flex-start;
+    word-wrap: break-word;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    direction: rtl;
+    text-align: right;
+    font-family: 'iransans', sans-serif;
+}
+
+/* چشمک زدن سه نقطه */
+.typing-indicator {
+    font-size: 18px;
+    color: #888;
+    display: inline-block;
+    animation: blink 1.5s infinite;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.file-upload-icon {
+    cursor: pointer;
+    font-size: 24px;
+    margin-right: 10px;
+    color: #496eaf;
+}
+
+.file-upload-icon:hover {
+    color: #3b5a94;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    font-family: 'iransans', sans-serif;
+}
+#phone-input {
+    padding: 10px 40px 10px 40px; /* Added padding for icon */
+    width: 80%;
+    border: 1px solid #ddd;
+    border-radius: 15px; /* Rounded corners */
+    background-color: #f9f9f9;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.3s ease; /* Smooth transition */
+    font-family: 'iransans', sans-serif;
+}
+
+/* Focus effect for the input */
+#phone-input:focus {
+    outline: none;
+    border-color: #496eaf;
+    box-shadow: 0 0 5px rgba(73, 110, 175, 0.5); /* Shadow on focus */
+    background-color: #fff;
+}
+
+/* Phone Icon */
+.phone-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #888;
+}
+.submit-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #496eaf;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-family: 'iransans', sans-serif;
+}
+
+.submit-btn:hover {
+    background-color: #3b5a94;
+}
+button {
+    background-color: #496eaf;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'iransans', sans-serif;
+}
+button:hover {
+    background-color: #3b5a94;
+}
+.message img {
+    display: block;
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 10px;
+    margin-top: 5px;
+}
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f3eb;
+    color: #5a4636;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+header {
+    background-color: #d7b899;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.container {
+    width: 100%;
+    margin: 0px auto;
+    text-align: center;
+}
+
+.main-image {
+    margin: 20px 0;
+}
+
+.main-image img {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.gallery {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: -28px 0;
+    flex-wrap: wrap;
+    padding: 0px 0;
+
+
+}
+
+.gallery img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.gallery img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+footer {
+    background-color: #d7b899;
+    color: #fff;
+    text-align: center;
+    padding: 31px 0;
+    margin-top: 20px;
+}
+
+footer p {
+    margin: 0;
+}
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .gallery {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .gallery img {
+        max-width: 90%;
+        margin-bottom: 15px;
+    }
+
+    .main-image img {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    .gallery img {
+        max-width: 90%;
+    }
+
+    .main-image img {
+        max-width: 100%;
+    }
+}
